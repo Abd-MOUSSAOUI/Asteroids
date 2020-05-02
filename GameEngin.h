@@ -1,47 +1,26 @@
 #pragma once
-#include "Game.h"
+#include "Ship.h"
+#include "GameObject.h"
 
 class GameEngin
 {
-    public:
-        enum action { UP = 0, LEFT = 1, RIGHT = 2, FIRE = 3, ALIVE = 4};
-        GameEngin(const char* textureSheet, SDL_Renderer* ren);
-        ~GameEngin();
+public:
 
-        void update();
-        void render();
-        void setSpeed(double sX);
-        void setShow(bool s);
-        double getSpeed();
-        bool isShowing();
-        void setRotation(double r);
-        double getRotation();
-        double getX();
-        double getY();
-        void setX(double x);
-        void setY(double y);
-        SDL_Rect getRect();
-        bool isSimpleTexture();
-        void setSimpleTexture(bool simpleTexture);
-        void setDimensions(int w, int h);
-        void setTexture(const char* textureSheet);
-        void actionShip(const int& action);
+    enum action { UP = 0, LEFT = 1, RIGHT = 2, FIRE = 3, ALIVE = 4};
+    GameEngin();
+    GameEngin(SDL_Renderer *rend);
 
-    private:
-        float velocity[2];
-        float cosA = 0.0;
-        float sinA = 0.0;
-        double x = 0.0;
-        double y = 0.0;
-        double speed = 0.0;
-        bool show = false;
-        bool simpleTexture = false;
-        double angle = 0.0;
-        double rotation = 0.0;
-        SDL_Texture* texture;
-        SDL_Renderer* renderer;
-        SDL_Rect position;
-        SDL_Point center;
-        int width = 60;
-        int height = 60;
+    //void spawnRock(const int& type, const int& number, const float& x = 0.0, const float& y = 0.0);
+
+    void actionShip(const int& action, bool down);
+    //void collisions();
+    void updatePositions(const float& deltaTime);
+    void interpolate(const float& deltaTime, const float& interpolation);
+    void render(SDL_Renderer *rend);
+
+private:
+    Ship player;
+    //std::map<std::string, Rock> rocks;
+    //int rockNum = 0;
+    
 };

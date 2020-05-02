@@ -1,4 +1,4 @@
-OBJS = Game.cpp GameEngin.cpp TextureManager.cpp Vector2D.cpp main.cpp
+OBJS = GameEngin.cpp Ship.cpp TextureManager.cpp App.cpp
 
 CC = g++
 
