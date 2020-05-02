@@ -6,16 +6,15 @@
 
 class App {
     public:
-        App(const char* title, int width, int height);
-        GameEngin getGame() { return game;}
+        App();
         void exit() { isRunning = false; }
-        bool running() { return isRunning;}
         void eventsHandler();
-        inline SDL_Renderer* getRend() { return renderer; }
+        void exec();
 
-    private:
+    private:    
+        SDL_Event event;
         GameEngin game;
-        bool isRunning = false;
+        bool isRunning = true;
         SDL_Window *window;
         SDL_Renderer *renderer;
 };

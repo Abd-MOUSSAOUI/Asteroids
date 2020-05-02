@@ -1,30 +1,9 @@
 #include "GameEngin.h"
 #include "TextureManager.h"
+#include "Ship.h"
 #include <iostream>
 
 GameEngin::GameEngin() {}
-
-GameEngin::GameEngin(SDL_Renderer *rend){
-    player = Ship(rend);
-}
-
-
-void GameEngin::updatePositions(const float& deltaTime){
-    player.updatePosition(deltaTime);
-
-    // for (auto rock = rocks.begin(); rock != rocks.end(); rock++) {
-    //     Rock& currentRock = rock->second;
-    //     currentRock.updatePosition(deltaTime);
-    // }
-}
-void GameEngin::render(SDL_Renderer *rend){
-        SDL_Texture *background = TextureManager::LoadTexture("img/background.png", rend);
-        SDL_RenderClear(rend);
-        SDL_RenderCopy(rend, background, 0, 0);
-        player.render(rend);
-        SDL_RenderPresent(rend);
-}
-
 
 void GameEngin::actionShip(const int& action,  bool down) {
     if (down) {
@@ -39,11 +18,7 @@ void GameEngin::actionShip(const int& action,  bool down) {
             case GameEngin::RIGHT:
                 player.rotate(Ship::RIGHT);
                 break;
-            case GameEngin::FIRE:
-                // if (player.isLoaded()) {
-                //     player.fire();
-                //     player.loaded(false);
-                // }
+            default:
                 break;
             }
         }
@@ -64,16 +39,26 @@ void GameEngin::actionShip(const int& action,  bool down) {
         case GameEngin::ALIVE:
             player.setAlive(true);
             break;
+        default:
+            break;
         }
     }
 }
 
+void GameEngin::updatePositions(const float& deltaTime){
+    player.updatePosition(deltaTime);
+}
+
 void GameEngin::interpolate(const float& deltaTime, const float& interpolation){
     player.interpolate(deltaTime, interpolation);
-
-    // for (auto rock = rocks.begin(); rock != rocks.end(); rock++) {
-    //     Rock& currentRock = rock->second;
-    //     currentRock.interpolate(deltaTime, interpolation);
-    // }
 }
+
+void GameEngin::render(SDL_Renderer *rend){
+        SDL_Texture *background = TextureManager::LoadTexture("img/background.png", rend);
+        SDL_RenderClear(rend);
+        SDL_RenderCopy(rend, background, 0, 0);
+        player.render(rend);
+        SDL_RenderPresent(rend);
+}
+
 

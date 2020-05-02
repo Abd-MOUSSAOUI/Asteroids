@@ -1,27 +1,24 @@
 #include "App.h"
 #include <cassert>
 
-App::App(const char* title, int width, int height) {
+App::App() {
     
     if (SDL_Init(SDL_INIT_EVERYTHING) == 0)
 	{
-		window = SDL_CreateWindow(title, 
+		window = SDL_CreateWindow("Asteroid", 
                                   SDL_WINDOWPOS_CENTERED, 
                                   SDL_WINDOWPOS_CENTERED, 
-                                  width, 
-                                  height, 
+                                  1200, 
+                                  800, 
                                   SDL_WINDOW_SHOWN|SDL_WINDOW_ALLOW_HIGHDPI);
 
 		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 		assert(renderer !=nullptr);
-		isRunning = true;
-        game = GameEngin(renderer);
 	}
 }
 
 void App::eventsHandler() {
-    SDL_Event event;
-
+    
     while (SDL_PollEvent(&event)) {
 
         switch(event.type) {
@@ -30,33 +27,31 @@ void App::eventsHandler() {
                 break;
             case SDL_KEYDOWN:
 
-                if (event.key.keysym.scancode == SDL_SCANCODE_UP)
-			        game.actionShip(GameEngin::UP, true);
+                if (event.key.keysym.scancode == SDL_SCANCODE_UP ||
+                    event.key.keysym.scancode == SDL_SCANCODE_Z)
+                    game.actionShip(GameEngin::UP, true);
 
-                if (event.key.keysym.scancode == SDL_SCANCODE_LEFT)
+                if (event.key.keysym.scancode == SDL_SCANCODE_LEFT ||
+                    event.key.keysym.scancode == SDL_SCANCODE_Q)
                     game.actionShip(GameEngin::LEFT, true);
 
-                if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT)
+                if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT ||
+                    event.key.keysym.scancode == SDL_SCANCODE_D)
                     game.actionShip(GameEngin::RIGHT, true);
-                
-                if (event.key.keysym.scancode == SDL_SCANCODE_SPACE)
-                    // game.actionShip(GameEngin::FIRE, true);
-                
                 break;
             case SDL_KEYUP:
 
-                if (event.key.keysym.scancode == SDL_SCANCODE_UP)
-			        game.actionShip(GameEngin::UP, false);
+                if (event.key.keysym.scancode == SDL_SCANCODE_UP ||
+                    event.key.keysym.scancode == SDL_SCANCODE_Z)
+                    game.actionShip(GameEngin::UP, false);
 
-                if (event.key.keysym.scancode == SDL_SCANCODE_LEFT)
-			        game.actionShip(GameEngin::LEFT, false);
+                if (event.key.keysym.scancode == SDL_SCANCODE_LEFT ||
+                    event.key.keysym.scancode == SDL_SCANCODE_Q)
+                    game.actionShip(GameEngin::LEFT, false);
 
-                if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT)
-			        game.actionShip(GameEngin::RIGHT, false);
-                
-                if (event.key.keysym.scancode == SDL_SCANCODE_SPACE)
-                    // game.actionShip(GameEngin::FIRE, false);
-                
+                if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT ||
+                    event.key.keysym.scancode == SDL_SCANCODE_D)
+                    game.actionShip(GameEngin::RIGHT, false);
                 break;
             default:
                 break;
@@ -64,20 +59,18 @@ void App::eventsHandler() {
     }
 }
 
-int main(int argc, char** argv) {
-
-    App app = App("Asteroid", 1200, 800);
-    GameEngin game = app.getGame();
+void App::exec() {
 
     const int FPS = 60;
     const int frameDelay = 1000 / FPS;
     int prevFrame = 0;
     int nextFrame = SDL_GetTicks();
+    srand(time(NULL));
     float dt = 0;
     float interpolation = 0;
 
-    while(app.running()) {
-        app.eventsHandler();
+    while(isRunning) {
+        this->eventsHandler();
         dt = float(SDL_GetTicks() - prevFrame)/ 1000.0f;
         int count = 0;
 
@@ -89,7 +82,13 @@ int main(int argc, char** argv) {
         }
         interpolation = float(SDL_GetTicks() + frameDelay - nextFrame) / float(frameDelay);
         game.interpolate(dt, interpolation);
-        game.render(app.getRend());
-    } 
+        game.render(renderer);
+    }
     SDL_Quit();
+}
+
+int main(){
+    App app;
+    app.exec();
+    return 0;
 }
