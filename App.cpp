@@ -38,6 +38,8 @@ void App::eventsHandler() {
                 if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT ||
                     event.key.keysym.scancode == SDL_SCANCODE_D)
                     game.actionShip(GameEngin::RIGHT, true);
+                if (event.key.keysym.scancode == SDL_SCANCODE_SPACE)
+                    game.actionShip(GameEngin::FIRE, true);
                 break;
             case SDL_KEYUP:
 
@@ -52,6 +54,9 @@ void App::eventsHandler() {
                 if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT ||
                     event.key.keysym.scancode == SDL_SCANCODE_D)
                     game.actionShip(GameEngin::RIGHT, false);
+                if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
+                    game.actionShip(GameEngin::FIRE, false);
+            }
                 break;
             default:
                 break;

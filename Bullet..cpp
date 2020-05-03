@@ -1,4 +1,4 @@
-#include "Ship.h"
+#include "Bullet.h"
 
 Ship::Ship()
 {
@@ -14,13 +14,9 @@ void Ship::updatePosition(const float& dt)
 {
     cosA = cos(angle*M_PI/180);
     sinA = sin(angle*M_PI/180);
-    if (thrust) {
-        speed = 2;
-        velocity[0] += speed * cosA;
-        velocity[1] += speed * sinA;
-    } else {
-        speed = 0;
-    }
+    speed = 10;
+    velocity[0] += speed * cosA;
+    velocity[1] += speed * sinA;
     
     switch (rot) {
         case LEFT:
@@ -59,8 +55,6 @@ void Ship::interpolate(const float& dT, const float& i)
 {
     position.x = prevPosition.x - (velocity[0] * dT) * i;
     position.y = prevPosition.y - (velocity[1] * dT) * i;
-    cosA = cos(angle*M_PI/180);
-    sinA = sin(angle*M_PI/180);
 }
 
 void Ship::render(SDL_Renderer *rend){
@@ -69,3 +63,7 @@ void Ship::render(SDL_Renderer *rend){
     SDL_RenderCopyEx(rend, texture, NULL, &position, angle, &center, SDL_FLIP_NONE);
 }
 
+bool Bullet::isDead() const
+{
+    return dead;
+}
