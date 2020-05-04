@@ -17,6 +17,7 @@ App::App() {
 	}
 }
 
+
 void App::eventsHandler() {
     
     while (SDL_PollEvent(&event)) {
@@ -33,58 +34,82 @@ void App::eventsHandler() {
         }
         switch(event.type) {
 
-            case SDL_MOUSEBUTTONDOWN:
-                    int x, y;
-                    SDL_GetMouseState( &x, &y );
-                    if(start.isTriggered(x, y)) {
-                        startPushed = true;
-                        std::cout << x << " " << y << std::endl;
-                    }
-            break;
-
             case SDL_KEYDOWN:
 
-                if (event.key.keysym.scancode == SDL_SCANCODE_UP ||
-                    event.key.keysym.scancode == SDL_SCANCODE_Z)
-                    game.actionShip(GameEngin::UP, true);
+                if (event.key.keysym.scancode == SDL_SCANCODE_UP)
+                    game.actionShip(GameEngin::UP, 1, true);
 
-                if (event.key.keysym.scancode == SDL_SCANCODE_LEFT ||
-                    event.key.keysym.scancode == SDL_SCANCODE_Q)
-                    game.actionShip(GameEngin::LEFT, true);
+                if(event.key.keysym.scancode == SDL_SCANCODE_Z && game.isMulti())
+                    game.actionShip(GameEngin::UP, 2, true);
 
-                if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT ||
-                    event.key.keysym.scancode == SDL_SCANCODE_D)
-                    game.actionShip(GameEngin::RIGHT, true);
+                if (event.key.keysym.scancode == SDL_SCANCODE_LEFT)
+                    game.actionShip(GameEngin::LEFT, 1, true);
+                
+                if(event.key.keysym.scancode == SDL_SCANCODE_Q && game.isMulti() )
+                    game.actionShip(GameEngin::LEFT, 2, true);
+
+                if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT)
+                    game.actionShip(GameEngin::RIGHT, 1, true);
+                
+                if(event.key.keysym.scancode == SDL_SCANCODE_D && game.isMulti())
+                    game.actionShip(GameEngin::RIGHT, 2, true);
 
                 if (event.key.keysym.scancode == SDL_SCANCODE_SPACE)
-                    game.actionShip(GameEngin::FIRE, true);
+                    game.actionShip(GameEngin::FIRE, 1, true);
+                
+                if (event.key.keysym.scancode == SDL_SCANCODE_W && game.isMulti())
+                    game.actionShip(GameEngin::FIRE, 2, true);
                 break;
 
             case SDL_KEYUP:
 
-                if (event.key.keysym.scancode == SDL_SCANCODE_UP ||
-                    event.key.keysym.scancode == SDL_SCANCODE_Z)
-                    game.actionShip(GameEngin::UP, false);
+                if (event.key.keysym.scancode == SDL_SCANCODE_UP)
+                    game.actionShip(GameEngin::UP, 1, false);
+                
+                if(event.key.keysym.scancode == SDL_SCANCODE_Z && game.isMulti())
+                    game.actionShip(GameEngin::UP, 2, false);
 
-                if (event.key.keysym.scancode == SDL_SCANCODE_LEFT ||
-                    event.key.keysym.scancode == SDL_SCANCODE_Q)
-                    game.actionShip(GameEngin::LEFT, false);
+                if (event.key.keysym.scancode == SDL_SCANCODE_LEFT)
+                    game.actionShip(GameEngin::LEFT, 1, false);
+                
+                if(event.key.keysym.scancode == SDL_SCANCODE_Q && game.isMulti())
+                    game.actionShip(GameEngin::LEFT, 2, false);
 
-                if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT ||
-                    event.key.keysym.scancode == SDL_SCANCODE_D)
-                    game.actionShip(GameEngin::RIGHT, false);
+                if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT)
+                    game.actionShip(GameEngin::RIGHT, 1, false);
+
+                if(event.key.keysym.scancode == SDL_SCANCODE_D && game.isMulti())
+                    game.actionShip(GameEngin::RIGHT, 2, false);
                     
                 if (event.key.keysym.scancode == SDL_SCANCODE_SPACE)
-                    game.actionShip(GameEngin::FIRE, false);
+                    game.actionShip(GameEngin::FIRE, 1, false);
+                
+                if (event.key.keysym.scancode == SDL_SCANCODE_W && game.isMulti())
+                    game.actionShip(GameEngin::FIRE, 2, false);
 
-                if (event.key.keysym.scancode == SDL_SCANCODE_R) 
-                    game.actionShip(GameEngin::ALIVE, false);
+                if (event.key.keysym.scancode == SDL_SCANCODE_R) {
+                    game.actionShip(GameEngin::ALIVE, 1, false);
+                    if(game.isMulti())
+                        game.actionShip(GameEngin::ALIVE, 2, false);
+                }
                 break;
             default:
                 break;
         }
     }
 }
+
+
+            // case SDL_MOUSEBUTTONDOWN:
+            //         int x, y;
+            //         SDL_GetMouseState( &x, &y );
+            //         if(start.isTriggered(x, y)) {
+            //             startPushed = true;
+            //             std::cout << x << " " << y << std::endl;
+            //         }
+            // break;
+
+
 
 void App::exec() {
 
@@ -101,7 +126,8 @@ void App::exec() {
     // while(!startPushed){
     //     this->eventsHandler();
     // }
-
+    //game.setMultiCombat(true);
+    //game.setPlayerPos(2);
     while(isRunning) {
 
         if(SDL_GetTicks() > rockTimer + 4000) {
@@ -118,7 +144,7 @@ void App::exec() {
             prevFrame = SDL_GetTicks();
             count++;
         }
-        game.collisions(renderer);
+        game.collisions();
         interpolation = float(SDL_GetTicks() + frameDelay - nextFrame) / float(frameDelay);
         game.interpolate(dt, interpolation);
         game.render(renderer);

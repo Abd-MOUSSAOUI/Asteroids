@@ -75,13 +75,8 @@ void Ship::fire()
     float vX = velocity[0] + 150 * cosA;
     float vY = velocity[1] + 150 * sinA;
 
-    std::stringstream ss;
-    ss << bulletNum;
-    std::string name = "bullet" + ss.str();
-
     Bullet sp = {r, vX, vY, Bullet::BULLET, bulletNum};
-
-    bullets.insert(std::pair<std::string, Bullet>(name, sp));
+    bullets.insert(std::pair<int, Bullet>(bulletNum, sp));
     bulletNum++;
 }
 
@@ -108,9 +103,22 @@ void Ship::render(SDL_Renderer *rend){
         SDL_RenderCopyEx(rend, texture, NULL, &position, angle, NULL, SDL_FLIP_NONE);
         SDL_DestroyTexture(texture);
     }
+
+    if(expl != nullptr) {
+        expl->render(rend);
+        if(!expl->isActive())
+            expl = nullptr;
+    }
     
     for (auto i = bullets.begin(); i != bullets.end(); i++) {
         i->second.render(rend);
     }
 }
 
+void Ship::setExpl(const int& type) {
+    expl = new Explosion(type, position.x - position.w/2, 
+                                              position.y - position.h/2, 
+                                              position.w*1.5, 
+                                              position.h*1.5, 
+                                              50, 50, 20);
+}

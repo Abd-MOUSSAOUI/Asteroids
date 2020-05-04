@@ -15,6 +15,7 @@ public:
     virtual void updatePosition(const float& dT);
     virtual void interpolate(const float& dT, const float& i);
     virtual void render(SDL_Renderer *r);
+    virtual void setExpl(const int& type);
 
     void setType(int type) { this->type = type; }
     int getType() { return type; }

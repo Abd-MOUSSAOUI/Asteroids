@@ -14,7 +14,7 @@ class Explosion {
         Explosion(const int& tp, const int& x, const int& y, const int& w, const int& h, const int& fw, const int& fh, const int& f);
         void move();
         void render(SDL_Renderer* rend);
-        inline int isActive() {return active; }
+        inline int isActive() {return (active < frame); }
     private:
         SDL_Rect position;
         SDL_Rect textR;

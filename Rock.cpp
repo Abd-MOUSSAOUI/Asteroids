@@ -54,4 +54,18 @@ void Rock::render(SDL_Renderer* rend)
     texture = TextureManager::LoadTexture("img/asteroid.png", rend);
     SDL_RenderCopyEx(rend, texture, NULL, &position, angle, NULL, SDL_FLIP_NONE);
     SDL_DestroyTexture(texture);
+
+    if(expl != nullptr) {
+        expl->render(rend);
+        if(!expl->isActive())
+            expl = nullptr;
+    }
+}
+
+void Rock::setExpl(const int& type) {
+    expl = new Explosion(type, position.x - position.w/2, 
+                                              position.y - position.h/2, 
+                                              position.w*1.5, 
+                                              position.h*1.5, 
+                                              50, 50, 20);
 }

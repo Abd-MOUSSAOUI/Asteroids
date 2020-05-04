@@ -7,23 +7,29 @@ GameEngin::GameEngin() {
     spawnRock(BIGROCK);
 }
 
-void GameEngin::actionShip(const int& action,  bool down) {
+void GameEngin::actionShip(const int& action, int playerNum, bool down) {
+    Ship* pl;
+    if(playerNum == 1)
+        pl = &player;
+    else
+        pl = &player2;
+    
     if (down) {
-        if (player.isAlive()) {
+        if (pl->isAlive()) {
             switch (action) {
             case GameEngin::UP:
-                player.thrusting(true);
+                pl->thrusting(true);
                 break;
             case GameEngin::LEFT:
-                player.rotate(Ship::LEFT);
+                pl->rotate(Ship::LEFT);
                 break;
             case GameEngin::RIGHT:
-                player.rotate(Ship::RIGHT);
+                pl->rotate(Ship::RIGHT);
                 break;
             case GameEngin::FIRE:
-                if (player.isLoaded()) {
-                    player.fire();
-                    player.loaded(false);
+                if (pl->isLoaded()) {
+                    pl->fire();
+                    pl->loaded(false);
                 }
                 break;
             default:
@@ -33,19 +39,19 @@ void GameEngin::actionShip(const int& action,  bool down) {
     } else {
         switch (action) {
         case GameEngin::UP:
-            player.thrusting(false);
+            pl->thrusting(false);
             break;
         case GameEngin::LEFT:
-            player.rotate(Ship::NONE);
+            pl->rotate(Ship::NONE);
             break;
         case GameEngin::RIGHT:
-            player.rotate(Ship::NONE);
+            pl->rotate(Ship::NONE);
             break;
         case GameEngin::FIRE:
-            player.loaded(true);
+            pl->loaded(true);
             break;
         case GameEngin::ALIVE:
-            player.setAlive(true);
+            pl->setAlive(true);
             break;
         default:
             break;
@@ -87,63 +93,99 @@ void GameEngin::spawnRock(const int& type, const float& x, const float& y)
     rockNum++;
 }
 
-void GameEngin::collisions(SDL_Renderer* rend) {
-    SDL_Rect colPoint;
-    bool col = true;
-
-    for(auto rock = rocks.begin(); rock != rocks.end(); rock++) {
+void GameEngin::rockShipCollision() {
+        SDL_Rect colPoint;
+        for(auto rock = rocks.begin(); rock != rocks.end(); rock++) {
         Rock& rk = rock->second;
         if(SDL_IntersectRect(player.getRect(), rk.getRect(), &colPoint) && player.isAlive()) {
             player.setAlive(false);
+            player.setExpl(Explosion::SHIPEXPL);
             if(player.getLife() <= 1){
                 player.setScore();
                 player.setLife(3);
             } else {
                 player.updateLife();
             }
-            explosions.push_back(new Explosion(Explosion::SHIPEXPL, player.getRect()->x - (player.getRect()->w)/2, 
-                                                                    player.getRect()->y - (player.getRect()->h)/2, 
-                                                                    player.getRect()->w*1.5, 
-                                                                    player.getRect()->h*1.5, 
-                                                                    50, 50, 20));
         }
-    }
 
-    while(col) {
-        col = false;
-        for (auto bul_it = player.getBullets()->begin(); bul_it != player.getBullets()->end(); bul_it++) {
-            Bullet& bul = bul_it->second;
-            for (auto rock_it = rocks.begin(); rock_it != rocks.end(); rock_it++) {
-                Rock& rk = rock_it->second;
-                if(SDL_IntersectRect(bul.getRect(), rk.getRect(), &colPoint)) {
-                    player.addScore();
-                    col = true;
-                    rockNum--;
-                    rocks.erase(rock_it);
-                    player.getBullets()->erase(bul_it++);
-
-                    if(rk.getType() == BIGROCK) {
-                        spawnRock(MEDROCK, rk.getPosition().x-50, rk.getPosition().y);
-                        spawnRock(MEDROCK, rk.getPosition().x+50, rk.getPosition().y);
-                        spawnRock(MEDROCK, rk.getPosition().x, rk.getPosition().y+50);
-                        spawnRock(SMLROCK, rk.getPosition().x, rk.getPosition().y);
-                    }
-                    if(rk.getType() == MEDROCK) {
-                        spawnRock(SMLROCK, rk.getPosition().x, rk.getPosition().y);
-                        spawnRock(SMLROCK, rk.getPosition().x, rk.getPosition().y);
-                        spawnRock(SMLROCK, rk.getPosition().x, rk.getPosition().y);
-                    }
-                break;
-                }
+        if(SDL_IntersectRect(player2.getRect(), rk.getRect(), &colPoint) && player2.isAlive()) {
+            player2.setAlive(false);
+            player2.setExpl(Explosion::SHIPEXPL);
+            if(player2.getLife() <= 1){
+                player2.setScore();
+                player2.setLife(3);
+            } else {
+                player2.updateLife();
             }
-            if(col)
-                break;
         }
     }
 }
 
+void GameEngin::bulletShipCollision(Ship* player1, Ship* player2) {
+    SDL_Rect colPoint;
+    for(auto bul = player1->getBullets()->begin(); bul != player1->getBullets()->end(); bul++) {
+        Bullet& currbul = bul->second;
+        if(SDL_IntersectRect(player2->getRect(), currbul.getRect(), &colPoint) && player2->isAlive()) {
+            player2->setAlive(false);
+            player2->setExpl(Explosion::SHIPEXPL);
+            player2->updateLife();
+            player1->addScoreCombat();
+        }
+    }
+}
+
+void GameEngin::bulletRockCollision(Ship* player) {
+    SDL_Rect colPoint;
+    bool col = true;
+    while(col) {
+    col = false;
+    for (auto bul_it = player->getBullets()->begin(); bul_it != player->getBullets()->end(); bul_it++) {
+        Bullet& bul = bul_it->second;
+        for (auto rock_it = rocks.begin(); rock_it != rocks.end(); rock_it++) {
+            Rock& rk = rock_it->second;
+            if(SDL_IntersectRect(bul.getRect(), rk.getRect(), &colPoint)) {
+                player->addScore();
+                col = true;
+                rockNum--;
+                rocks.erase(rock_it);
+                player->getBullets()->erase(bul_it++);
+
+                if(rk.getType() == BIGROCK) {
+                    spawnRock(MEDROCK, rk.getPosition().x-50, rk.getPosition().y);
+                    spawnRock(MEDROCK, rk.getPosition().x+50, rk.getPosition().y);
+                    spawnRock(MEDROCK, rk.getPosition().x, rk.getPosition().y+50);
+                    spawnRock(SMLROCK, rk.getPosition().x, rk.getPosition().y);
+                }
+                if(rk.getType() == MEDROCK) {
+                    spawnRock(SMLROCK, rk.getPosition().x, rk.getPosition().y);
+                    spawnRock(SMLROCK, rk.getPosition().x, rk.getPosition().y);
+                    spawnRock(SMLROCK, rk.getPosition().x, rk.getPosition().y);
+                }
+                break;
+            }
+        }
+        if(col)
+            break;
+        }
+    }
+}
+
+void GameEngin::collisions() {
+    rockShipCollision();
+    bulletRockCollision(&player);
+    if(isMulti())
+        bulletRockCollision(&player2);
+    if(multiCombat) {
+        bulletShipCollision(&player, &player2);
+        bulletShipCollision(&player2, &player);
+    }
+
+}
+
 void GameEngin::updatePositions(const float& deltaTime){
     player.updatePosition(deltaTime);
+    if(isMulti())
+        player2.updatePosition(deltaTime);
     for (auto rock = rocks.begin(); rock != rocks.end(); rock++) {
         Rock& currentRock = rock->second;
         currentRock.updatePosition(deltaTime);
@@ -152,7 +194,8 @@ void GameEngin::updatePositions(const float& deltaTime){
 
 void GameEngin::interpolate(const float& deltaTime, const float& interpolation){
     player.interpolate(deltaTime, interpolation);
-
+    if(isMulti())
+        player2.interpolate(deltaTime, interpolation);
     for (auto rock = rocks.begin(); rock != rocks.end(); rock++) {
         Rock& currentRock = rock->second;
         currentRock.interpolate(deltaTime, interpolation);
@@ -161,22 +204,34 @@ void GameEngin::interpolate(const float& deltaTime, const float& interpolation){
 
 void GameEngin::render(SDL_Renderer *rend){
 
-        text = "score: " + std::to_string(player.getScore()) + "    lives: " + std::to_string(player.getLife());               
+        scoreP1 = "score: " + std::to_string(player.getScore()) + "    lives: " + std::to_string(player.getLife());               
+        
         font = TTF_OpenFont("arial.ttf", 16);
-        White = {255, 255, 255, 0};  
-        text_surface = TTF_RenderText_Solid(font, text.c_str(), White);
+        White = {255, 255, 255, 0};
+        surface_P1 = TTF_RenderText_Solid(font, scoreP1.c_str(), White);
+        P1_t = SDL_CreateTextureFromSurface(rend, surface_P1);
+        p1_rect = {1000,0,180,50};  
+        SDL_FreeSurface(surface_P1);
+        if(isMulti()){
+            scoreP2 = "score2: " + std::to_string(player2.getScore()) + "    lives: " + std::to_string(player2.getLife());
+            surface_P2 = TTF_RenderText_Solid(font, scoreP2.c_str(), White);
+            P2_t = SDL_CreateTextureFromSurface(rend, surface_P2);
+            p2_rect = {0,0,180,50};  
+            SDL_FreeSurface(surface_P2);
+        }
         TTF_CloseFont(font);
-        text_t = SDL_CreateTextureFromSurface(rend, text_surface); 
-        SDL_FreeSurface(text_surface);
-        text_rect = {1000,0,180,50};  
-
         background = TextureManager::LoadTexture("img/background.png", rend);
         SDL_RenderClear(rend);
         SDL_RenderCopy(rend, background, 0, 0);
         SDL_DestroyTexture(background);
-        SDL_RenderCopy(rend, text_t, NULL, &text_rect); 
-        SDL_DestroyTexture(text_t);
+        SDL_RenderCopy(rend, P1_t, NULL, &p1_rect); 
+        SDL_DestroyTexture(P1_t);
         player.render(rend);
+        if(isMulti()){
+            SDL_RenderCopy(rend, P2_t, NULL, &p2_rect); 
+            SDL_DestroyTexture(P2_t);
+            player2.render(rend);
+        }
         for (auto rock = rocks.begin(); rock != rocks.end(); rock++) {
             Rock& currentRock = rock->second;
             currentRock.render(rend);
@@ -194,6 +249,16 @@ void GameEngin::render(SDL_Renderer *rend){
             }
         }
         SDL_RenderPresent(rend);
+}
+
+void GameEngin::setPlayerPos(const int& type) {
+    if(type == 1) {
+        player.setInitPos(player.getRect()->x, player.getRect()->y-100);
+        player2.setInitPos(player2.getRect()->x, player2.getRect()->y+100);
+    } else {
+        player.setInitPos(0, 50, 180);
+        player2.setInitPos(1100, 700);
+    }
 }
 
 

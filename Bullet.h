@@ -10,9 +10,12 @@ public:
     virtual void updatePosition(const float& dT);
     virtual void interpolate(const float& dT, const float& i);
     virtual void render(SDL_Renderer *rend);
+    virtual void setExpl(const int& type);
     bool isDead() const;
+
 
 private:
     int type;
     bool dead;
+    int bulletNum = 0;
 };

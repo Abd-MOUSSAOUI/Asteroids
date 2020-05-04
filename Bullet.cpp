@@ -9,6 +9,7 @@ Bullet::Bullet(SDL_Rect r, const float& vX, const float& vY, const int& t, const
     velocity[0] = vX;
     velocity[1] = vY;
     center = {position.w / 2, position.h / 2};
+    bulletNum = n;
 }
 
 
@@ -28,7 +29,8 @@ void Bullet::updatePosition(const float& dt)
 }
 
 void Bullet::interpolate(const float& dT, const float& i)
-{
+{   
+    std::cout << bulletNum << std::endl;
     position.x = prevPosition.x - (velocity[0] * dT) * i;
     position.y = prevPosition.y - (velocity[1] * dT) * i;
 }
@@ -43,4 +45,8 @@ void Bullet::render(SDL_Renderer *rend){
 bool Bullet::isDead() const
 {
     return dead;
+}
+
+void Bullet::setExpl(const int& type){
+    (void)type;
 }
