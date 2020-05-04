@@ -5,9 +5,6 @@
 
 GameEngin::GameEngin() {
     spawnRock(BIGROCK);
-    SDL_Color color = { 255, 255, 255 };
-    font = TTF_OpenFont("arial.ttf", 25);
-    surface = TTF_RenderText_Solid(font,"Score", color);
 }
 
 void GameEngin::actionShip(const int& action,  bool down) {
@@ -93,10 +90,16 @@ void GameEngin::spawnRock(const int& type, const float& x, const float& y)
 void GameEngin::collisions(SDL_Renderer* rend) {
     SDL_Rect colPoint;
     bool col = true;
+
     for(auto rock = rocks.begin(); rock != rocks.end(); rock++) {
         Rock& rk = rock->second;
-        if(SDL_IntersectRect(player.getRect(), rk.getRect(), &colPoint)) {
+        if(SDL_IntersectRect(player.getRect(), rk.getRect(), &colPoint) && player.isAlive()) {
             player.setAlive(false);
+            explosions.push_back(new Explosion(Explosion::SHIPEXPL, player.getRect()->x - (player.getRect()->w)/2, 
+                                                                    player.getRect()->y - (player.getRect()->h)/2, 
+                                                                    player.getRect()->w*1.5, 
+                                                                    player.getRect()->h*1.5, 
+                                                                    50, 50, 20));
             player.setScore();
         }
     }
@@ -153,14 +156,38 @@ void GameEngin::interpolate(const float& deltaTime, const float& interpolation){
 }
 
 void GameEngin::render(SDL_Renderer *rend){
-        SDL_Texture *background = TextureManager::LoadTexture("img/background.png", rend);
+
+        score_text = "score: " + std::to_string(player.getScore());        
+        font = TTF_OpenFont("OpenSans-Regular.ttf", 10);
+        White = {255, 255, 255, 0};  
+        surface = TTF_RenderText_Solid(font, score_text.c_str(), White);
+        TTF_CloseFont(font);
+        score = SDL_CreateTextureFromSurface(rend, surface); 
+        SDL_FreeSurface(surface);
+        score_rect = {1000,0,150,50};  
+        
+        background = TextureManager::LoadTexture("img/background.png", rend);
         SDL_RenderClear(rend);
         SDL_RenderCopy(rend, background, 0, 0);
         SDL_DestroyTexture(background);
+        SDL_RenderCopy(rend, score, NULL, &score_rect); 
+        SDL_DestroyTexture(score);
         player.render(rend);
         for (auto rock = rocks.begin(); rock != rocks.end(); rock++) {
             Rock& currentRock = rock->second;
             currentRock.render(rend);
+        }
+        int dead = true;
+        while(dead) {
+            dead = false;
+            for (auto expl = explosions.begin(); expl != explosions.end(); expl++) {
+                (*expl)->render(rend);
+                if((*expl)->isActive() >= 20 ) {
+                     expl = explosions.erase(expl);
+                     dead = true;
+                     break;
+                }
+            }
         }
         SDL_RenderPresent(rend);
 }

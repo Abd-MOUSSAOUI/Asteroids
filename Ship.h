@@ -24,6 +24,9 @@ public:
     void addScore() { score += 50; }
     int getScore() { return score; }
     void setScore() { score = 0; }
+    void updateLife() { lifes -= 1; }
+    int getLife() { return lifes; }
+    void setLife() { lifes = 0; }
 private:
     std::map<std::string, Bullet> bullets;
     int rot = NONE;
@@ -32,6 +35,6 @@ private:
     bool alive = true;
     bool thrust = false;
     bool load = true;
-
+    int lifes = 0;
     int bulletNum = 0;
 };

@@ -6,6 +6,7 @@ Ship::Ship()
     position = {600, 400, 80, 80};
     velocity[0] = 0.0;
     velocity[1] = 0.0;
+    lifes = 3;
     center = {position.w / 2, position.h / 2};
 }
 

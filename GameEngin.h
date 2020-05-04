@@ -2,6 +2,7 @@
 #include "Ship.h"
 #include "GameObject.h"
 #include "Rock.h"
+#include "Explosion.h"
 
 class GameEngin
 {
@@ -19,9 +20,16 @@ public:
 
 
 private:
-    TTF_Font *font;
-    SDL_Surface *surface;
     Ship player;
     std::map<int, Rock> rocks;
     int rockNum = 0;
+
+    std::vector<Explosion*> explosions;
+
+    std::string score_text;
+    TTF_Font *font;
+    SDL_Color White;
+    SDL_Surface *surface;
+    SDL_Texture *score , *background;
+    SDL_Rect score_rect;
 };
