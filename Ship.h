@@ -26,7 +26,7 @@ public:
     void setScore() { score = 0; }
     void updateLife() { lifes -= 1; }
     int getLife() { return lifes; }
-    void setLife() { lifes = 0; }
+    void setLife(int val) { lifes = val; }
 private:
     std::map<std::string, Bullet> bullets;
     int rot = NONE;

@@ -26,10 +26,10 @@ private:
 
     std::vector<Explosion*> explosions;
 
-    std::string score_text;
+    std::string text;
     TTF_Font *font;
     SDL_Color White;
-    SDL_Surface *surface;
-    SDL_Texture *score , *background;
-    SDL_Rect score_rect;
+    SDL_Surface *text_surface;
+    SDL_Texture *text_t , *background;
+    SDL_Rect text_rect;
 };

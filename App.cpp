@@ -33,6 +33,15 @@ void App::eventsHandler() {
         }
         switch(event.type) {
 
+            case SDL_MOUSEBUTTONDOWN:
+                    int x, y;
+                    SDL_GetMouseState( &x, &y );
+                    if(start.isTriggered(x, y)) {
+                        startPushed = true;
+                        std::cout << x << " " << y << std::endl;
+                    }
+            break;
+
             case SDL_KEYDOWN:
 
                 if (event.key.keysym.scancode == SDL_SCANCODE_UP ||
@@ -87,6 +96,11 @@ void App::exec() {
     float dt = 0;
     float interpolation = 0;
     float rockTimer = 0;
+
+    // start.render(renderer);
+    // while(!startPushed){
+    //     this->eventsHandler();
+    // }
 
     while(isRunning) {
 

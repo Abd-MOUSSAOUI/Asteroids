@@ -1,4 +1,4 @@
-OBJS = Explosion.cpp GameEngin.cpp Ship.cpp Rock.cpp Bullet.cpp TextureManager.cpp App.cpp
+OBJS = Explosion.cpp Button.cpp GameEngin.cpp Ship.cpp Rock.cpp Bullet.cpp TextureManager.cpp App.cpp
 
 CC = g++
 

@@ -1,4 +1,5 @@
 #pragma once
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -8,8 +9,6 @@
 #include <map>
 #include <iostream>
 #include <vector>
-#include "SDL2/SDL.h"
-#include "SDL2/SDL_image.h"
 #include "SDL2/SDL_ttf.h"
 #include "TextureManager.h"
 

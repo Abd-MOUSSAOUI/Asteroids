@@ -95,17 +95,21 @@ void GameEngin::collisions(SDL_Renderer* rend) {
         Rock& rk = rock->second;
         if(SDL_IntersectRect(player.getRect(), rk.getRect(), &colPoint) && player.isAlive()) {
             player.setAlive(false);
+            if(player.getLife() <= 1){
+                player.setScore();
+                player.setLife(3);
+            } else {
+                player.updateLife();
+            }
             explosions.push_back(new Explosion(Explosion::SHIPEXPL, player.getRect()->x - (player.getRect()->w)/2, 
                                                                     player.getRect()->y - (player.getRect()->h)/2, 
                                                                     player.getRect()->w*1.5, 
                                                                     player.getRect()->h*1.5, 
                                                                     50, 50, 20));
-            player.setScore();
         }
     }
 
     while(col) {
-        std::cout << rockNum << std::endl;
         col = false;
         for (auto bul_it = player.getBullets()->begin(); bul_it != player.getBullets()->end(); bul_it++) {
             Bullet& bul = bul_it->second;
@@ -157,21 +161,21 @@ void GameEngin::interpolate(const float& deltaTime, const float& interpolation){
 
 void GameEngin::render(SDL_Renderer *rend){
 
-        score_text = "score: " + std::to_string(player.getScore());        
-        font = TTF_OpenFont("OpenSans-Regular.ttf", 10);
+        text = "score: " + std::to_string(player.getScore()) + "    lives: " + std::to_string(player.getLife());               
+        font = TTF_OpenFont("arial.ttf", 16);
         White = {255, 255, 255, 0};  
-        surface = TTF_RenderText_Solid(font, score_text.c_str(), White);
+        text_surface = TTF_RenderText_Solid(font, text.c_str(), White);
         TTF_CloseFont(font);
-        score = SDL_CreateTextureFromSurface(rend, surface); 
-        SDL_FreeSurface(surface);
-        score_rect = {1000,0,150,50};  
-        
+        text_t = SDL_CreateTextureFromSurface(rend, text_surface); 
+        SDL_FreeSurface(text_surface);
+        text_rect = {1000,0,180,50};  
+
         background = TextureManager::LoadTexture("img/background.png", rend);
         SDL_RenderClear(rend);
         SDL_RenderCopy(rend, background, 0, 0);
         SDL_DestroyTexture(background);
-        SDL_RenderCopy(rend, score, NULL, &score_rect); 
-        SDL_DestroyTexture(score);
+        SDL_RenderCopy(rend, text_t, NULL, &text_rect); 
+        SDL_DestroyTexture(text_t);
         player.render(rend);
         for (auto rock = rocks.begin(); rock != rocks.end(); rock++) {
             Rock& currentRock = rock->second;
