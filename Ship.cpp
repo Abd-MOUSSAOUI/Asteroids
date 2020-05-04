@@ -21,13 +21,12 @@ void Ship::updatePosition(const float& dt)
     } else {
         speed = 0;
     }
-    
     switch (rot) {
         case LEFT:
-            angle -= 2.5;
+            angle -= 5;
             break;
         case RIGHT:
-            angle += 2.5;
+            angle += 5;
             break;
         case NONE:
             break;
@@ -50,22 +49,67 @@ void Ship::updatePosition(const float& dt)
     if (position.y < 0) {
         position.y += 800;
     }
+    for (auto i = bullets.begin(); i != bullets.end(); ) {
+        if ((i -> second).isDead())
+            i = bullets.erase(i);
+        else
+            ++i;
+    }
+    for (auto i = bullets.begin(); i != bullets.end(); i++) {
+        i->second.updatePosition(dt);
+    }
 
     prevPosition.x = position.x;
     prevPosition.y = position.y;
+}
+
+void Ship::fire()
+{
+    cosA = cos(angle*M_PI/180);
+    sinA = sin(angle*M_PI/180);
+    velocity[0] += speed * cosA;
+    velocity[1] += speed * sinA;
+
+    SDL_Rect r = {position.x, position.y, 10, 10};
+    float vX = velocity[0] + 150 * cosA;
+    float vY = velocity[1] + 150 * sinA;
+
+    std::stringstream ss;
+    ss << bulletNum;
+    std::string name = "bullet" + ss.str();
+
+    Bullet sp = {r, vX, vY, Bullet::BULLET, bulletNum};
+
+    bullets.insert(std::pair<std::string, Bullet>(name, sp));
+    bulletNum++;
 }
 
 void Ship::interpolate(const float& dT, const float& i)
 {
     position.x = prevPosition.x - (velocity[0] * dT) * i;
     position.y = prevPosition.y - (velocity[1] * dT) * i;
-    cosA = cos(angle*M_PI/180);
-    sinA = sin(angle*M_PI/180);
+    if(alive){
+        cosA = cos(angle*M_PI/180);
+        sinA = sin(angle*M_PI/180);
+    } else {
+        velocity[0] = velocity[1] = 0;
+    }
+    for (auto j = bullets.begin(); j != bullets.end(); j++)
+    {
+        j->second.interpolate(dT, i);
+    }
 }
 
 void Ship::render(SDL_Renderer *rend){
 
-    texture = TextureManager::LoadTexture("img/ship.png", rend);
-    SDL_RenderCopyEx(rend, texture, NULL, &position, angle, &center, SDL_FLIP_NONE);
+    if(alive){
+        texture = TextureManager::LoadTexture("img/ship.png", rend);
+        SDL_RenderCopyEx(rend, texture, NULL, &position, angle, NULL, SDL_FLIP_NONE);
+        SDL_DestroyTexture(texture);
+    }
+    
+    for (auto i = bullets.begin(); i != bullets.end(); i++) {
+        i->second.render(rend);
+    }
 }
 

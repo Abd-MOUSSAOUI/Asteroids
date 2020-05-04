@@ -1,7 +1,17 @@
 #pragma once
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <cmath>
+#include <algorithm>
+#include <map>
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_image.h"
+#include "SDL2/SDL_ttf.h"
 #include <iostream>
+#include "TextureManager.h"
+
 
 class GameObject
 {
@@ -11,7 +21,8 @@ class GameObject
         virtual void render(SDL_Renderer *rend) = 0;
         
         inline float* getVelocity() { return velocity; }
-        inline SDL_Point getPosition() { return {position.x,position.y}; }
+        inline SDL_Point getPosition() { return {position.x, position.y}; }
+        inline SDL_Rect* getRect() { return &position; }
 
     protected:
         float velocity[2];

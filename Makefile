@@ -1,10 +1,10 @@
-OBJS = GameEngin.cpp Ship.cpp TextureManager.cpp App.cpp
+OBJS = GameEngin.cpp Ship.cpp Rock.cpp Bullet.cpp TextureManager.cpp App.cpp
 
 CC = g++
 
 COMPILER_FLAGS = -Wall -std=c++11
 
-LINKER_FLAGS = -lSDL2 -lSDL2_image
+LINKER_FLAGS = -lSDL2 -lSDL2_image -lSDL2_ttf
 
 OBJ_NAME = Asteroids
 

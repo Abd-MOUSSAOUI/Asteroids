@@ -1,7 +1,6 @@
 #ifndef __APPH__
 #define __APPH__
 
-#include "TextureManager.h"
 #include "GameEngin.h"
 
 class App {

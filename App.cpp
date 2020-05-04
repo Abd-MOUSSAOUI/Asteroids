@@ -11,7 +11,7 @@ App::App() {
                                   1200, 
                                   800, 
                                   SDL_WINDOW_SHOWN|SDL_WINDOW_ALLOW_HIGHDPI);
-
+        TTF_Init();
 		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 		assert(renderer !=nullptr);
 	}
@@ -20,11 +20,19 @@ App::App() {
 void App::eventsHandler() {
     
     while (SDL_PollEvent(&event)) {
-
+        
+        if (event.type == SDL_QUIT) {
+            this->exit();
+        } else if (event.type == SDL_WINDOWEVENT) {
+            if (event.window.event == SDL_WINDOWEVENT_FOCUS_LOST) {
+                SDL_Event focus;
+                focus.type = SDL_WINDOWEVENT;
+                focus.window.event = SDL_WINDOWEVENT_FOCUS_GAINED;
+                SDL_WaitEvent(&focus);
+            }
+        }
         switch(event.type) {
-            case SDL_QUIT:
-                isRunning = false;
-                break;
+
             case SDL_KEYDOWN:
 
                 if (event.key.keysym.scancode == SDL_SCANCODE_UP ||
@@ -38,9 +46,11 @@ void App::eventsHandler() {
                 if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT ||
                     event.key.keysym.scancode == SDL_SCANCODE_D)
                     game.actionShip(GameEngin::RIGHT, true);
+
                 if (event.key.keysym.scancode == SDL_SCANCODE_SPACE)
                     game.actionShip(GameEngin::FIRE, true);
                 break;
+
             case SDL_KEYUP:
 
                 if (event.key.keysym.scancode == SDL_SCANCODE_UP ||
@@ -54,9 +64,12 @@ void App::eventsHandler() {
                 if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT ||
                     event.key.keysym.scancode == SDL_SCANCODE_D)
                     game.actionShip(GameEngin::RIGHT, false);
-                if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
+                    
+                if (event.key.keysym.scancode == SDL_SCANCODE_SPACE)
                     game.actionShip(GameEngin::FIRE, false);
-            }
+
+                if (event.key.keysym.scancode == SDL_SCANCODE_R) 
+                    game.actionShip(GameEngin::ALIVE, false);
                 break;
             default:
                 break;
@@ -73,8 +86,14 @@ void App::exec() {
     srand(time(NULL));
     float dt = 0;
     float interpolation = 0;
+    float rockTimer = 0;
 
     while(isRunning) {
+
+        if(SDL_GetTicks() > rockTimer + 4000) {
+            game.spawnRock(BIGROCK);
+            rockTimer = SDL_GetTicks();
+        }
         this->eventsHandler();
         dt = float(SDL_GetTicks() - prevFrame)/ 1000.0f;
         int count = 0;
@@ -85,11 +104,15 @@ void App::exec() {
             prevFrame = SDL_GetTicks();
             count++;
         }
+        game.collisions(renderer);
         interpolation = float(SDL_GetTicks() + frameDelay - nextFrame) / float(frameDelay);
         game.interpolate(dt, interpolation);
         game.render(renderer);
     }
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
     SDL_Quit();
+    TTF_Quit();
 }
 
 int main(){
