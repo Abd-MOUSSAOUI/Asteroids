@@ -13,7 +13,7 @@ public:
     enum action { UP = 0, LEFT = 1, RIGHT = 2, FIRE = 3, ALIVE = 4};
     GameEngin();
 
-    void spawnRock(const int& type, const float& x = 0.0, const float& y = 0.0);
+    void spawnRock(const int& type, const float& x = 0.0, const float& y = 0.0, const int& n = 1);
     void collisions();
     void rockShipCollision();
     void bulletRockCollision(Ship* player);
@@ -35,8 +35,6 @@ private:
     Ship player2;
     std::map<int, Rock> rocks;
     int rockNum = 0;
-
-    std::vector<Explosion*> explosions;
 
     std::string scoreP1, scoreP2;
     TTF_Font *font;

@@ -131,8 +131,8 @@ void App::exec(int const& mod) {
 
     while(isRunning) {
 
-        if(SDL_GetTicks() > rockTimer + 4000) {
-            game.spawnRock(Rock::BIGROCK);
+        if(SDL_GetTicks() > rockTimer + 15000) {
+            //game.spawnRock(Rock::BIGROCK);
             rockTimer = SDL_GetTicks();
         }
         if(SDL_GetTicks() > lifeTimer + (dis2(gen))*(dis(gen)) ) {

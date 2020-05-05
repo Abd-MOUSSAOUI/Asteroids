@@ -1,12 +1,12 @@
 #include "Rock.h"
 
 Rock::Rock(SDL_Point p, const float& vX, const float& vY, const int& t, const int& n)
-: type(t), num(n)
+: type(t)
 {   
     position = {p.x, p.y, t, t};
     prevPosition = {p.x, p.y, t, t};
     angle = (rand() % 314) / 100;
-    if (num % 2 == 0) {
+    if (n % 2 == 0) {
         angleVel = 0.01;
     } else {
         angleVel = -0.01;

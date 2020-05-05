@@ -7,7 +7,6 @@
 #include <cmath>
 #include <algorithm>
 #include <map>
-#include <iostream>
 #include <vector>
 #include "SDL2/SDL_ttf.h"
 #include "TextureManager.h"
@@ -25,7 +24,8 @@ class GameObject
         inline SDL_Point getPosition() { return {position.x, position.y}; }
         inline SDL_Rect* getRect() { return &position; }
         inline void setInitPos(const int& valX, const int& valY, const int& a = 0) {position.x = prevPosition.x = valX; 
-                                                                  position.y = prevPosition.y = valY; angle = a;}
+                                                                                    position.y = prevPosition.y = valY;   
+                                                                                    angle = a;}
 
     protected:
         float velocity[2];

@@ -16,11 +16,12 @@ public:
     virtual void setExpl(const int& type);
     
     void fire();
-    void thrusting(bool val) { thrust = val; }
-    void setAlive(const bool& val) { alive = val; }
-    void loaded(const bool& val) { load = val; }
-    void rotate(int val) { rot = val; }
-    std::map<int, Bullet>* getBullets() { return &bullets; }
+    
+    inline void thrusting(bool val) { thrust = val; }
+    inline void setAlive(const bool& val) { alive = val; }
+    inline void loaded(const bool& val) { load = val; }
+    inline void rotate(int val) { rot = val; }
+    inline std::map<int, Bullet>* getBullets() { return &bullets; }
     inline bool isAlive() { return alive; }
     inline bool isLoaded() { return load; }
     inline void addScore() { score += 50; }

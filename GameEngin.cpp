@@ -59,7 +59,7 @@ void GameEngin::actionShip(const int& action, int playerNum, bool down) {
     }
 }
 
-void GameEngin::spawnRock(const int& type, const float& x, const float& y)
+void GameEngin::spawnRock(const int& type, const float& x, const float& y, const int& n)
 {
     std::random_device rd, rd2;
     std::mt19937 gen(rd()) ,gen2(rd2());
@@ -69,36 +69,38 @@ void GameEngin::spawnRock(const int& type, const float& x, const float& y)
     SDL_Point tempPos;
     float tempVel[2];
     
-    if(type == Rock::LIFE || type == Rock::SHOOT){
-        tempPos = {dis(gen), dis2(gen2)};
-        tempVel[0] = tempVel[1] = 0;
-    }
-    else{
-        if (x == 0.0 && y == 00) {
-            tempPos = {dis(gen) + rand(), dis2(gen2) + rand()};
-            if (tempPos.x < player.getPosition().x + 250 || tempPos.x > player.getPosition().x - 250 ||
-                tempPos.y < player.getPosition().y + 250 || tempPos.y > player.getPosition().y - 250) {
-                tempPos.x += 200;
-                tempPos.y -= 200;
+    for(int i=0; i<n; i++) {
+        if(type == Rock::LIFE || type == Rock::SHOOT){
+            tempPos = {dis(gen), dis2(gen2)};
+            tempVel[0] = tempVel[1] = 0;
+        }
+        else{
+            if (x == 0.0 && y == 00) {
+                tempPos = {dis(gen) + rand(), dis2(gen2) + rand()};
+                if (tempPos.x < player.getPosition().x + 250 || tempPos.x > player.getPosition().x - 250 ||
+                    tempPos.y < player.getPosition().y + 250 || tempPos.y > player.getPosition().y - 250) {
+                    tempPos.x += 200;
+                    tempPos.y -= 200;
+                }
+            }
+            
+            tempPos = {int(x), int(y)};
+            
+            if (rand() % 2 + 1 == 2) {
+                tempVel[0] = rand() % 25 + 15;
+            } else {
+                tempVel[0] = (rand()%25 + 15) * -1;
+            }
+            if (rand() % 2 + 1 == 2) {
+                tempVel[1] = rand() % 25 + 15;
+            } else {
+                tempVel[1] = (rand() % 25 + 15) * -1;
             }
         }
-        
-        tempPos = {int(x), int(y)};
-        
-        if (rand() % 2 + 1 == 2) {
-            tempVel[0] = rand() % 25 + 15;
-        } else {
-            tempVel[0] = (rand()%25 + 15) * -1;
-        }
-        if (rand() % 2 + 1 == 2) {
-            tempVel[1] = rand() % 25 + 15;
-        } else {
-            tempVel[1] = (rand() % 25 + 15) * -1;
-        }
+        Rock tempRock = {tempPos, tempVel[0], tempVel[1], type, rockNum};
+        rocks.insert(std::pair<int, Rock>(rockNum, tempRock));
+        rockNum++;
     }
-    Rock tempRock = {tempPos, tempVel[0], tempVel[1], type, rockNum};
-    rocks.insert(std::pair<int, Rock>(rockNum, tempRock));
-    rockNum++;
 }
 
 void GameEngin::rockShipCollision() {
@@ -139,8 +141,13 @@ void GameEngin::bulletShipCollision(Ship* player1, Ship* player2) {
         if(SDL_IntersectRect(player2->getRect(), currbul.getRect(), &colPoint) && player2->isAlive()) {
             player2->setAlive(false);
             player2->setExpl(Explosion::SHIPEXPL);
-            player2->updateLife();
             player1->addScoreCombat();
+            if(player2->getLife() <= 1){
+                player2->setScore();
+                player2->setLife(3);
+            } else {
+                player2->updateLife();
+            }
         }
     }
 }
@@ -168,15 +175,10 @@ void GameEngin::bulletRockCollision(Ship* player) {
                     rockNum--;
 
                     if(rk.getType() == Rock::BIGROCK) {
-                        spawnRock(Rock::MEDROCK, rk.getPosition().x-50, rk.getPosition().y);
-                        spawnRock(Rock::MEDROCK, rk.getPosition().x+50, rk.getPosition().y);
-                        spawnRock(Rock::MEDROCK, rk.getPosition().x, rk.getPosition().y+50);
-                        //spawnRock(Rock::SMLROCK, rk.getPosition().x, rk.getPosition().y);
+                        spawnRock(Rock::MEDROCK, rk.getPosition().x, rk.getPosition().y, 4);
                     }
                     if(rk.getType() == Rock::MEDROCK) {
-                        //spawnRock(Rock::SMLROCK, rk.getPosition().x, rk.getPosition().y);
-                        spawnRock(Rock::SMLROCK, rk.getPosition().x, rk.getPosition().y);
-                        spawnRock(Rock::SMLROCK, rk.getPosition().x, rk.getPosition().y);
+                        spawnRock(Rock::SMLROCK, rk.getPosition().x, rk.getPosition().y, 5);
                     }
                 }
                 rocks.erase(rock_it);

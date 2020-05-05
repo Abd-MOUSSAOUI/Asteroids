@@ -20,14 +20,13 @@ public:
     virtual void render(SDL_Renderer *r);
     virtual void setExpl(const int& type);
 
-    void setType(int type) { this->type = type; }
-    int getType() { return type; }
-    int getLife() {return life;}
+    inline void setType(int type) { this->type = type; }
+    inline int getType() { return type; }
+    inline int getLife() {return life;}
 private:
     int type;
-    int num = 0;
     float angleVel = 0.0;
-    int life = 30;
+    int life = 45;
 };
 
 #endif
