@@ -11,13 +11,15 @@ Rock::Rock(SDL_Point p, const float& vX, const float& vY, const int& t, const in
     } else {
         angleVel = -0.01;
     }
-
     velocity[0] = vX;
     velocity[1] = vY;
 }
 
 void Rock::updatePosition(const float& dT)
 {
+    if(type == LIFE || type == SHOOT)
+        return;
+
     position.x = prevPosition.x - velocity[0] * dT;
     position.y = prevPosition.y - velocity[1] * dT;
 
@@ -45,27 +47,26 @@ void Rock::updatePosition(const float& dT)
 
 void Rock::interpolate(const float& dT, const float& i)
 {
+    if(type == LIFE || type == SHOOT)
+        return;
     position.x = prevPosition.x - (velocity[0] * dT) * i;
     position.y = prevPosition.y - (velocity[1] * dT) * i;
 }
 
 void Rock::render(SDL_Renderer* rend)
 {
-    // if(type == LIFE){
-    //     texture = TextureManager::LoadTexture("img/life.png", rend);
-    //     SDL_RenderCopyEx(rend, texture, NULL, &position, angle, NULL, SDL_FLIP_NONE);
-    //     SDL_DestroyTexture(texture);
-    // }
-    // else if(type == SHOOT){
-    //     texture = TextureManager::LoadTexture("img/shoot.png", rend);
-    //     SDL_RenderCopyEx(rend, texture, NULL, &position, angle, NULL, SDL_FLIP_NONE);
-    //     SDL_DestroyTexture(texture);
-    // }
-    // else{
+     if(type == LIFE){
+        life--;
+        texture = TextureManager::LoadTexture("img/life.png", rend);
+     }
+     else if(type == SHOOT) {
+         life--;
+         texture = TextureManager::LoadTexture("img/shoot.png", rend);
+     } else 
         texture = TextureManager::LoadTexture("img/asteroid.png", rend);
-        SDL_RenderCopyEx(rend, texture, NULL, &position, angle, NULL, SDL_FLIP_NONE);
-        SDL_DestroyTexture(texture);
-    // }
+    
+    SDL_RenderCopyEx(rend, texture, NULL, &position, angle, NULL, SDL_FLIP_NONE);
+    SDL_DestroyTexture(texture);
 
     if(expl != nullptr) {
         expl->render(rend);

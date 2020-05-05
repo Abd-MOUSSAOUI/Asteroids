@@ -24,10 +24,10 @@ void Ship::updatePosition(const float& dt)
     }
     switch (rot) {
         case LEFT:
-            angle -= 5;
+            angle -= 3.5;
             break;
         case RIGHT:
-            angle += 5;
+            angle += 3.5;
             break;
         case NONE:
             break;
@@ -77,9 +77,11 @@ void Ship::fire()
     float vX = velocity[0] + 150 * cosA;
     float vY = velocity[1] + 150 * sinA;
 
-    Bullet sp = {r, vX, vY, Bullet::BULLET, bulletNum};
-    bullets.insert(std::pair<int, Bullet>(bulletNum, sp));
-    bulletNum++;
+    for(int i = 0; i < shootMod; i++) {
+        Bullet sp = {r, vX+(i*50*cosA), vY+(i*50*sinA), Bullet::BULLET, bulletNum};
+        bullets.insert(std::pair<int, Bullet>(bulletNum, sp));
+        bulletNum++;
+    }
 }
 
 void Ship::interpolate(const float& dT, const float& i)

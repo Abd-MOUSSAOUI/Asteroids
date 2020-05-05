@@ -23,14 +23,16 @@ public:
     std::map<int, Bullet>* getBullets() { return &bullets; }
     inline bool isAlive() { return alive; }
     inline bool isLoaded() { return load; }
-    void addScore() { score += 50; }
-    void addScoreCombat() { score += 500; }
-    int getScore() { return score; }
-    void setScore() { score = 0; }
-    void updateLife() { lifes -= 1; }
-    int getLife() { return lifes; }
-    void addLife() { lifes += 1; }
-    void setLife(int val) { lifes = val; }
+    inline void addScore() { score += 50; }
+    inline void addScoreCombat() { score += 500; }
+    inline int getScore() { return score; }
+    inline void setScore() { score = 0; }
+    inline void updateLife() { lifes -= 1; }
+    inline int getLife() { return lifes; }
+    inline void addLife() { lifes += 1; }
+    inline void setLife(int val) { lifes = val; }
+    inline void setShootMod(int val) { shootMod = val; }
+
 private:
     std::map<int, Bullet> bullets;
     int rot = NONE;
@@ -41,4 +43,5 @@ private:
     bool load = true;
     int lifes = 0;
     int bulletNum = 0;
+    int shootMod = 1;
 };

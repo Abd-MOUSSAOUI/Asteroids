@@ -1,4 +1,6 @@
 #pragma once
+
+#include <random>
 #include "Ship.h"
 #include "GameObject.h"
 #include "Rock.h"

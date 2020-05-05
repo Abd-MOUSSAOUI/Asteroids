@@ -61,33 +61,41 @@ void GameEngin::actionShip(const int& action, int playerNum, bool down) {
 
 void GameEngin::spawnRock(const int& type, const float& x, const float& y)
 {
-    // if(rockNum >= 10)
-    //     return;
-
+    std::random_device rd, rd2;
+    std::mt19937 gen(rd()) ,gen2(rd2());
+    std::uniform_int_distribution<> dis(0, 1200);
+    std::uniform_int_distribution<> dis2(0, 800);
+    
     SDL_Point tempPos;
-    if (x == 0.0 && y == 00) {
-        tempPos = {rand() % 1100 + 100, rand() % 700 + 100};
-        if (tempPos.x < player.getPosition().x + 80 || tempPos.x > player.getPosition().x - 80 ||
-            tempPos.y < player.getPosition().y + 80 || tempPos.y > player.getPosition().y - 80) {
-            tempPos.x += 200;
-            tempPos.y -= 200;
+    float tempVel[2];
+    
+    if(type == Rock::LIFE || type == Rock::SHOOT){
+        tempPos = {dis(gen), dis2(gen2)};
+        tempVel[0] = tempVel[1] = 0;
+    }
+    else{
+        if (x == 0.0 && y == 00) {
+            tempPos = {dis(gen) + rand(), dis2(gen2) + rand()};
+            if (tempPos.x < player.getPosition().x + 250 || tempPos.x > player.getPosition().x - 250 ||
+                tempPos.y < player.getPosition().y + 250 || tempPos.y > player.getPosition().y - 250) {
+                tempPos.x += 200;
+                tempPos.y -= 200;
+            }
+        }
+        
+        tempPos = {int(x), int(y)};
+        
+        if (rand() % 2 + 1 == 2) {
+            tempVel[0] = rand() % 25 + 15;
+        } else {
+            tempVel[0] = (rand()%25 + 15) * -1;
+        }
+        if (rand() % 2 + 1 == 2) {
+            tempVel[1] = rand() % 25 + 15;
+        } else {
+            tempVel[1] = (rand() % 25 + 15) * -1;
         }
     }
-    
-    tempPos = {int(x), int(y)};
-    
-    float tempVel[2];
-    if (rand() % 2 + 1 == 2) {
-        tempVel[0] = rand() % 25 + 15;
-    } else {
-        tempVel[0] = (rand()%25 + 15) * -1;
-    }
-    if (rand() % 2 + 1 == 2) {
-        tempVel[1] = rand() % 25 + 15;
-    } else {
-        tempVel[1] = (rand() % 25 + 15) * -1;
-    }
-
     Rock tempRock = {tempPos, tempVel[0], tempVel[1], type, rockNum};
     rocks.insert(std::pair<int, Rock>(rockNum, tempRock));
     rockNum++;
@@ -97,8 +105,10 @@ void GameEngin::rockShipCollision() {
         SDL_Rect colPoint;
         for(auto rock = rocks.begin(); rock != rocks.end(); rock++) {
         Rock& rk = rock->second;
-        if(SDL_IntersectRect(player.getRect(), rk.getRect(), &colPoint) && player.isAlive()) {
+        if(SDL_IntersectRect(player.getRect(), rk.getRect(), &colPoint) && player.isAlive() && 
+                             (rk.getType()!=Rock::LIFE) && (rk.getType()!=Rock::SHOOT)) {
             player.setAlive(false);
+            player.setShootMod(1);
             player.setExpl(Explosion::SHIPEXPL);
             if(player.getLife() <= 1){
                 player.setScore();
@@ -108,7 +118,8 @@ void GameEngin::rockShipCollision() {
             }
         }
 
-        if(SDL_IntersectRect(player2.getRect(), rk.getRect(), &colPoint) && player2.isAlive()) {
+        if(SDL_IntersectRect(player2.getRect(), rk.getRect(), &colPoint) && player2.isAlive() &&
+                             (rk.getType()!=Rock::LIFE) && (rk.getType()!=Rock::SHOOT)) {
             player2.setAlive(false);
             player2.setExpl(Explosion::SHIPEXPL);
             if(player2.getLife() <= 1){
@@ -144,23 +155,32 @@ void GameEngin::bulletRockCollision(Ship* player) {
         for (auto rock_it = rocks.begin(); rock_it != rocks.end(); rock_it++) {
             Rock& rk = rock_it->second;
             if(SDL_IntersectRect(bul.getRect(), rk.getRect(), &colPoint)) {
-                player->addScore();
                 col = true;
-                rockNum--;
+                if(rk.getType() == Rock::LIFE)
+                {
+                    player->setLife(player->getLife()+1);
+                }
+                else if (rk.getType() == Rock::SHOOT) {
+                    player->setShootMod(3);
+                }
+                else {
+                    player->addScore();
+                    rockNum--;
+
+                    if(rk.getType() == Rock::BIGROCK) {
+                        spawnRock(Rock::MEDROCK, rk.getPosition().x-50, rk.getPosition().y);
+                        spawnRock(Rock::MEDROCK, rk.getPosition().x+50, rk.getPosition().y);
+                        spawnRock(Rock::MEDROCK, rk.getPosition().x, rk.getPosition().y+50);
+                        //spawnRock(Rock::SMLROCK, rk.getPosition().x, rk.getPosition().y);
+                    }
+                    if(rk.getType() == Rock::MEDROCK) {
+                        //spawnRock(Rock::SMLROCK, rk.getPosition().x, rk.getPosition().y);
+                        spawnRock(Rock::SMLROCK, rk.getPosition().x, rk.getPosition().y);
+                        spawnRock(Rock::SMLROCK, rk.getPosition().x, rk.getPosition().y);
+                    }
+                }
                 rocks.erase(rock_it);
                 player->getBullets()->erase(bul_it++);
-
-                if(rk.getType() == Rock::BIGROCK) {
-                    spawnRock(Rock::MEDROCK, rk.getPosition().x-50, rk.getPosition().y);
-                    spawnRock(Rock::MEDROCK, rk.getPosition().x+50, rk.getPosition().y);
-                    //spawnRock(MEDROCK, rk.getPosition().x, rk.getPosition().y+50);
-                    //spawnRock(SMLROCK, rk.getPosition().x, rk.getPosition().y);
-                }
-                if(rk.getType() == Rock::MEDROCK) {
-                    //spawnRock(SMLROCK, rk.getPosition().x, rk.getPosition().y);
-                    spawnRock(Rock::SMLROCK, rk.getPosition().x, rk.getPosition().y);
-                    spawnRock(Rock::SMLROCK, rk.getPosition().x, rk.getPosition().y);
-                }
                 break;
             }
         }
@@ -236,13 +256,14 @@ void GameEngin::render(SDL_Renderer *rend){
             Rock& currentRock = rock->second;
             currentRock.render(rend);
         }
+        
         int dead = true;
         while(dead) {
             dead = false;
-            for (auto expl = explosions.begin(); expl != explosions.end(); expl++) {
-                (*expl)->render(rend);
-                if((*expl)->isActive() >= 20 ) {
-                     expl = explosions.erase(expl);
+            for (auto rock = rocks.begin(); rock != rocks.end(); rock++) {
+                Rock& rk = rock->second;
+                if(!rk.getLife()) {
+                     rocks.erase(rock);
                      dead = true;
                      break;
                 }

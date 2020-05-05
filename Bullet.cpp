@@ -30,7 +30,6 @@ void Bullet::updatePosition(const float& dt)
 
 void Bullet::interpolate(const float& dT, const float& i)
 {   
-    std::cout << bulletNum << std::endl;
     position.x = prevPosition.x - (velocity[0] * dT) * i;
     position.y = prevPosition.y - (velocity[1] * dT) * i;
 }
