@@ -4,7 +4,7 @@
 #include <iostream>
 
 GameEngin::GameEngin() {
-    spawnRock(BIGROCK);
+    spawnRock(Rock::BIGROCK);
 }
 
 void GameEngin::actionShip(const int& action, int playerNum, bool down) {
@@ -61,8 +61,8 @@ void GameEngin::actionShip(const int& action, int playerNum, bool down) {
 
 void GameEngin::spawnRock(const int& type, const float& x, const float& y)
 {
-    if(rockNum >= 10)
-        return;
+    // if(rockNum >= 10)
+    //     return;
 
     SDL_Point tempPos;
     if (x == 0.0 && y == 00) {
@@ -150,16 +150,16 @@ void GameEngin::bulletRockCollision(Ship* player) {
                 rocks.erase(rock_it);
                 player->getBullets()->erase(bul_it++);
 
-                if(rk.getType() == BIGROCK) {
-                    spawnRock(MEDROCK, rk.getPosition().x-50, rk.getPosition().y);
-                    spawnRock(MEDROCK, rk.getPosition().x+50, rk.getPosition().y);
-                    spawnRock(MEDROCK, rk.getPosition().x, rk.getPosition().y+50);
-                    spawnRock(SMLROCK, rk.getPosition().x, rk.getPosition().y);
+                if(rk.getType() == Rock::BIGROCK) {
+                    spawnRock(Rock::MEDROCK, rk.getPosition().x-50, rk.getPosition().y);
+                    spawnRock(Rock::MEDROCK, rk.getPosition().x+50, rk.getPosition().y);
+                    //spawnRock(MEDROCK, rk.getPosition().x, rk.getPosition().y+50);
+                    //spawnRock(SMLROCK, rk.getPosition().x, rk.getPosition().y);
                 }
-                if(rk.getType() == MEDROCK) {
-                    spawnRock(SMLROCK, rk.getPosition().x, rk.getPosition().y);
-                    spawnRock(SMLROCK, rk.getPosition().x, rk.getPosition().y);
-                    spawnRock(SMLROCK, rk.getPosition().x, rk.getPosition().y);
+                if(rk.getType() == Rock::MEDROCK) {
+                    //spawnRock(SMLROCK, rk.getPosition().x, rk.getPosition().y);
+                    spawnRock(Rock::SMLROCK, rk.getPosition().x, rk.getPosition().y);
+                    spawnRock(Rock::SMLROCK, rk.getPosition().x, rk.getPosition().y);
                 }
                 break;
             }

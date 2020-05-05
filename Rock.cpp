@@ -51,9 +51,21 @@ void Rock::interpolate(const float& dT, const float& i)
 
 void Rock::render(SDL_Renderer* rend)
 {
-    texture = TextureManager::LoadTexture("img/asteroid.png", rend);
-    SDL_RenderCopyEx(rend, texture, NULL, &position, angle, NULL, SDL_FLIP_NONE);
-    SDL_DestroyTexture(texture);
+    // if(type == LIFE){
+    //     texture = TextureManager::LoadTexture("img/life.png", rend);
+    //     SDL_RenderCopyEx(rend, texture, NULL, &position, angle, NULL, SDL_FLIP_NONE);
+    //     SDL_DestroyTexture(texture);
+    // }
+    // else if(type == SHOOT){
+    //     texture = TextureManager::LoadTexture("img/shoot.png", rend);
+    //     SDL_RenderCopyEx(rend, texture, NULL, &position, angle, NULL, SDL_FLIP_NONE);
+    //     SDL_DestroyTexture(texture);
+    // }
+    // else{
+        texture = TextureManager::LoadTexture("img/asteroid.png", rend);
+        SDL_RenderCopyEx(rend, texture, NULL, &position, angle, NULL, SDL_FLIP_NONE);
+        SDL_DestroyTexture(texture);
+    // }
 
     if(expl != nullptr) {
         expl->render(rend);

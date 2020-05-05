@@ -68,10 +68,12 @@ void Ship::fire()
 {
     cosA = cos(angle*M_PI/180);
     sinA = sin(angle*M_PI/180);
+
     velocity[0] += speed * cosA;
     velocity[1] += speed * sinA;
 
     SDL_Rect r = {position.x, position.y, 10, 10};
+
     float vX = velocity[0] + 150 * cosA;
     float vY = velocity[1] + 150 * sinA;
 
@@ -84,6 +86,7 @@ void Ship::interpolate(const float& dT, const float& i)
 {
     position.x = prevPosition.x - (velocity[0] * dT) * i;
     position.y = prevPosition.y - (velocity[1] * dT) * i;
+   
     if(alive){
         cosA = cos(angle*M_PI/180);
         sinA = sin(angle*M_PI/180);
@@ -103,7 +106,7 @@ void Ship::render(SDL_Renderer *rend){
         SDL_RenderCopyEx(rend, texture, NULL, &position, angle, NULL, SDL_FLIP_NONE);
         SDL_DestroyTexture(texture);
     }
-
+    
     if(expl != nullptr) {
         expl->render(rend);
         if(!expl->isActive())

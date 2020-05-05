@@ -1,15 +1,24 @@
 #ifndef __ROCKH__
 #define __ROCKH__
 
-#define BIGROCK 150
-#define MEDROCK 100
-#define SMLROCK 50
+// #define BIGROCK 150
+// #define MEDROCK 100
+// #define SMLROCK 50
+// #define LIFE 50
+// #define SHOOT 50
 
 #include "GameObject.h"
 
 class Rock : public GameObject
 {
 public:
+    enum TYPES {
+        BIGROCK = 150,
+        MEDROCK = 100,
+        SMLROCK = 50,
+        LIFE = 50,
+        SHOOT = 50
+    };
     Rock(SDL_Point p, const float& vX, const float& vY, const int& t, const int& n);
 
     virtual void updatePosition(const float& dT);

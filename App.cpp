@@ -1,5 +1,4 @@
 #include "App.h"
-#include <cassert>
 
 App::App() {
     
@@ -100,18 +99,8 @@ void App::eventsHandler() {
 }
 
 
-            // case SDL_MOUSEBUTTONDOWN:
-            //         int x, y;
-            //         SDL_GetMouseState( &x, &y );
-            //         if(start.isTriggered(x, y)) {
-            //             startPushed = true;
-            //             std::cout << x << " " << y << std::endl;
-            //         }
-            // break;
 
-
-
-void App::exec() {
+void App::exec(int const& mod) {
 
     const int FPS = 60;
     const int frameDelay = 1000 / FPS;
@@ -122,18 +111,37 @@ void App::exec() {
     float interpolation = 0;
     float rockTimer = 0;
 
-    // start.render(renderer);
-    // while(!startPushed){
-    //     this->eventsHandler();
-    // }
-    //game.setMultiCombat(true);
-    //game.setPlayerPos(2);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(5000, 50000);
+
+    // float lifeTimer = 0;
+    // float shootTimer = 0;
+
+    if(mod == 1) {
+        game.setMultiSimple(true);
+        game.setPlayerPos(1);
+    }
+
+    if(mod == 2) {
+        game.setMultiCombat(true);
+        game.setPlayerPos(2);
+    }
+
     while(isRunning) {
 
         if(SDL_GetTicks() > rockTimer + 4000) {
-            game.spawnRock(BIGROCK);
+            game.spawnRock(Rock::BIGROCK);
             rockTimer = SDL_GetTicks();
         }
+        // if(SDL_GetTicks() / 2000 > lifeTimer + 2*(dis(gen)) ) {
+        //     game.spawnRock(Rock::LIFE);
+        //     lifeTimer = SDL_GetTicks();
+        // }
+        // if(SDL_GetTicks() > shootTimer + dis(gen) + dis(gen)) {
+        //     game.spawnRock(Rock::SHOOT);
+        //     shootTimer = SDL_GetTicks();
+        // }
         this->eventsHandler();
         dt = float(SDL_GetTicks() - prevFrame)/ 1000.0f;
         int count = 0;
@@ -155,8 +163,33 @@ void App::exec() {
     TTF_Quit();
 }
 
-int main(){
+int main(int argc, char** argv){
+    int opt;
+    int multiS = 0;
+    int multiC = 0;
+
+    while((opt = getopt(argc,argv,"cm")) != -1) {
+        switch (opt)
+        {        
+            case 'c':
+                multiC = 1;
+                break;
+            case 'm':
+                multiS = 1;
+                break;
+            case '?':
+                fprintf(stderr, "Usage: ./Asteroid [-c|-m]\n-c for combat mod, -m for coop mod\n");
+                exit(1);
+        }
+    }
+
+    if(multiS && multiC) {
+        fprintf(stderr, "Usage: ./Asteroid [-c|-m]\n-c for combat mod, -m for coop mod\n");
+        exit(1);   
+    }
+
+    int mod = (multiS)? 1 : ((multiC)? 2 : 0);
+
     App app;
-    app.exec();
-    return 0;
+    app.exec(mod);
 }
